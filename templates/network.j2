@@ -1,0 +1,25 @@
+config interface 'loopback'
+	option ifname 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+{# #WTF? Ver https://en.wikipedia.org/wiki/Unique_local_address
+ # No lo utilizamos.
+	option ula_prefix 'fdc7:9d89:cf51::/48'
+#}
+
+{% for key,value in interfaces.iteritems() %}
+config interface '{{ key }}'
+	option proto 'static'
+	option ifname '{{value.interfaz}}'
+	option ipaddr '{{ value.ip }}'
+	option netmask '{{ value.mask }}'
+{% if value.gateway is defined %}	option gateway '{{value.gateway}}'
+{% endif %}
+{% if value.dns is defined %}	option dns '{{value.dns}}'
+{% endif %}
+	option delegate '0'
+
+{% endfor %}

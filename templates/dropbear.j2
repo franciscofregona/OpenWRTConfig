@@ -1,0 +1,4 @@
+config dropbear
+	option PasswordAuth 'on'
+	option Port '{{puertoSSH}}'
+	option Interface '{% for key,value in interfaces.iteritems() %}{% if value.tipo is equalto 'management' %}{{ key }}{% endif %}{% endfor %}'

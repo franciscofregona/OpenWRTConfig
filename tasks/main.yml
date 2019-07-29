@@ -1,0 +1,68 @@
+---
+
+- name: Routers. Crear carpetas locales.
+  file:
+    path: "{{inventory_dir}}/host_files/{{inventory_hostname}}"
+    state: directory
+  delegate_to: 127.0.0.1
+
+- name: Routers. Crear template archivo System
+  template:
+    src: system.j2
+    dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/system"
+  delegate_to: 127.0.0.1
+
+- name: Routers. Crear template archivo network
+  template:
+    src: network.j2
+    dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/network"
+  delegate_to: 127.0.0.1
+
+- name: Routers. Crear template archivo firewall.user.
+  template:
+    src: firewall.user.j2
+    dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall.user"
+  delegate_to: 127.0.0.1
+
+- name: Routers. Crear template archivo firewall.
+  template:
+    src: firewall.j2
+    dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall"
+  delegate_to: 127.0.0.1
+
+- name: Routers. Crear template archivo dropbear.
+  template:
+    src: dropbear.j2
+    dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/dropbear"
+  delegate_to: 127.0.0.1
+  
+- name: Routers. Aplicacion de cfg. System.
+  raw: echo "{{item}}" > /etc/config/system
+  with_file:
+    - "{{inventory_dir}}/host_files/{{inventory_hostname}}/system"
+
+- name: Routers. Aplicacion de cfg. Interfaces de red.
+  raw: echo "{{item}}" > /etc/config/network
+  with_file:
+    - "{{inventory_dir}}/host_files/{{inventory_hostname}}/network"
+
+- name: Routers. Aplicacion de cfg. Firewall.user.
+  raw: echo "{{item}}" > /etc/firewall.user
+  with_file:
+    - "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall.user"
+
+- name: Routers. Aplicacion de cfg. Firewall (web).
+  raw: echo "{{item}}" > /etc/config/firewall
+  with_file:
+    - "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall"
+
+- name: Routers. Aplicacion de cfg. Dropbear (ssh).
+  raw: echo "{{item}}" > /etc/config/dropbear
+  with_file:
+    - "{{inventory_dir}}/host_files/{{inventory_hostname}}/dropbear"
+
+- name: Routers. Reiniciar las redes.
+  raw: /etc/init.d/network reload
+  
+- name: Routers. Reiniciar firewall.
+  raw: /etc/init.d/firewall reload

@@ -1,0 +1,8 @@
+---
+# defaults file for routersetup
+#Puertos a los que se permitira el ruteo. Especificar rangos con ":". Ej 5555:5565 e individuales con comas.
+#No se si funcionaria mezclar ambos (ie: 5555,5565,1000-1010) pero tal vez si.
+puertosBackup: '5555,5565,18000:18009'
+puertoSSH: 22
+puertoWeb: 80
+redAdministracion: '10.1.14.0/23'

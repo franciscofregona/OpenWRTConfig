@@ -1,0 +1,20 @@
+#Los puertos que han de abrirse a ese pasaje de red de clientes a red de backbone.
+PuertosBackup='{{puertosBackup}}'
+
+#La Interfaz 'de salida' en un pasaje/ruteo de paquetes de clientes a red de backbone.
+#(O sea, la interfaz del router a la red de backbone.)
+#Se crea una variable por cada interfaz de backbone presente...
+{% for key,value in interfaces.iteritems() %}
+{% if value.tipo is equalto 'backbone' %}IFBackbone{{value.interfaz}}='{{value.interfaz}}'
+{% endif %}
+{% endfor %}
+
+#Habilitar pasaje/ruteo Clientes->Backbone.
+#En caso de querer explicitar las redes clientes, hay que hacer una regla por cada una. Es mas eficiente hacer una sola regla. (y aumenta la velocidad del trafico).
+{% for key,value in interfaces.iteritems() %}
+{% if value.tipo is equalto 'backbone' %}
+iptables -A FORWARD -i "\$IFBackbone{{value.interfaz}}" -p tcp -m multiport --sport "\$PuertosBackup" -j ACCEPT
+iptables -A FORWARD -o "\$IFBackbone{{value.interfaz}}" -p tcp -m multiport --dport "\$PuertosBackup" -j ACCEPT
+{% endif %}
+{% endfor %}
+

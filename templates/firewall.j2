@@ -1,0 +1,100 @@
+config defaults
+	option input 'DROP'
+	option output 'DROP'
+	option forward 'DROP'
+
+config include
+	option path '/etc/firewall.user'
+
+# Zona para los clientes #
+config zone
+	option name 'Clientes'
+	option family 'ipv4'
+	option network '{% for key,value in interfaces.iteritems() %}{% if value.tipo is equalto 'cliente' %}{{ key }} {% endif %}{% endfor %}'
+	option forward 'DROP'
+	option input 'DROP'
+	option output 'DROP'
+
+# Zona para los backbones #
+config zone
+	option name 'backbone'
+	option family 'ipv4'
+	option network '{% for key,value in interfaces.iteritems() %}{% if value.tipo is equalto 'backbone' %}{{ key }} {% endif %}{% endfor %}'
+	option input 'DROP'
+	option output 'DROP'
+	option forward 'DROP'
+
+# Zona para las interfaces de management #
+config zone
+	option name 'Management'
+	option family 'ipv4'
+	option network '{% for key,value in interfaces.iteritems() %}{% if value.tipo is equalto 'management' %}{{ key }} {% endif %}{% endfor %}'
+	option input 'DROP'
+	option forward 'DROP'
+	option output 'DROP'
+
+### Reglas de firewall ###
+# Permitir trafico de ping ICMP sobre zona de Management #
+config rule
+	option name 'PING out'
+	option family 'ipv4'
+	option proto 'icmp'
+	option dest 'Management'
+	option dest_ip '{{redAdministracion}}'
+	option target 'ACCEPT'
+
+config rule
+	option name 'PING in'
+	option family 'ipv4'
+	option proto 'icmp'
+	option src 'Management'
+	option src_ip '{{redAdministracion}}'
+	option target 'ACCEPT'
+
+#Estas reglas se repetiran para cada interfaz de management.
+{% for key,value in interfaces.iteritems() %}
+{% if value.tipo is equalto 'management' %}
+# Permitir trafico SSH #
+config rule
+	option name 'SSH in en {{value.interfaz}}'
+	option family 'ipv4'
+	option proto 'tcp'
+	option dest_ip '{{ value.ip }}'
+	option dest_port '{{puertoSSH}}'
+	option extra '-m conntrack --ctstate NEW,ESTABLISHED'
+	option src 'Management'
+	option src_ip '{{redAdministracion}}'
+	option target 'ACCEPT'
+
+config rule
+	option name 'SSH out en {{value.interfaz}}'
+	option family 'ipv4'
+	option proto 'tcp'
+	option dest 'Management'
+	option dest_ip '{{redAdministracion}}'
+	option extra '-m conntrack --ctstate ESTABLISHED'
+	option src_port '{{puertoSSH}}'
+	option target 'ACCEPT'
+
+# Permitir trafico a la web de administracion sobre zona de Management #
+config rule
+	option name 'Web Adm in en {{value.interfaz}}'
+	option family 'ipv4'
+	option proto 'tcp'
+	option dest_ip '{{ value.ip }}'
+	option dest_port '{{ puertoWeb }}'
+	option src 'Management'
+	option src_ip '{{redAdministracion}}'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Web Adm out en {{value.interfaz}}'
+	option family 'ipv4'
+	option proto 'tcp'
+	option dest 'Management'
+	option dest_ip '{{redAdministracion}}'
+	option src_ip '{{ value.ip }}'
+	option src_port '{{ puertoWeb }}'
+	option target 'ACCEPT'
+{% endif %}
+{% endfor %}
