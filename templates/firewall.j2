@@ -36,7 +36,7 @@ config zone
 ### Reglas de firewall ###
 # Permitir trafico de ping ICMP sobre zona de Management #
 config rule
-	option name 'PING out'
+	option name 'PING out ADM'
 	option family 'ipv4'
 	option proto 'icmp'
 	option dest 'Management'
@@ -44,19 +44,36 @@ config rule
 	option target 'ACCEPT'
 
 config rule
-	option name 'PING in'
+	option name 'PING in ADM'
 	option family 'ipv4'
 	option proto 'icmp'
 	option src 'Management'
 	option src_ip '{{redAdministracion}}'
 	option target 'ACCEPT'
 
+# Permitir trafico de ping ICMP al servidor Zabbix #
+config rule
+	option name 'PING out Zabbix'
+	option family 'ipv4'
+	option proto 'icmp'
+	option dest 'Management'
+	option dest_ip '{{zabbixIp}}'
+	option target 'ACCEPT'
+
+config rule
+	option name 'PING in Zabbix'
+	option family 'ipv4'
+	option proto 'icmp'
+	option src 'Management'
+	option src_ip '{{zabbixIp}}'
+	option target 'ACCEPT'
+	
 #Estas reglas se repetiran para cada interfaz de management.
 {% for key,value in interfaces.iteritems() %}
 {% if value.tipo is equalto 'management' %}
 # Permitir trafico SSH #
 config rule
-	option name 'SSH in en {{value.interfaz}}'
+	option name 'SSH in ADM en {{value.interfaz}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest_ip '{{ value.ip }}'
@@ -67,7 +84,7 @@ config rule
 	option target 'ACCEPT'
 
 config rule
-	option name 'SSH out en {{value.interfaz}}'
+	option name 'SSH out ADM en {{value.interfaz}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest 'Management'
@@ -78,7 +95,7 @@ config rule
 
 # Permitir trafico a la web de administracion sobre zona de Management #
 config rule
-	option name 'Web Adm in en {{value.interfaz}}'
+	option name 'Web Adm in ADM en {{value.interfaz}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest_ip '{{ value.ip }}'
@@ -88,7 +105,7 @@ config rule
 	option target 'ACCEPT'
 
 config rule
-	option name 'Web Adm out en {{value.interfaz}}'
+	option name 'Web Adm out ADM en {{value.interfaz}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest 'Management'

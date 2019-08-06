@@ -16,6 +16,8 @@ config interface '{{ key }}'
 	option ifname '{{value.interfaz}}'
 	option ipaddr '{{ value.ip }}'
 	option netmask '{{ value.mask }}'
+{% if value.tipo is equalto 'cliente' %}	option mtu '9000'
+{% endif %}
 {% if value.gateway is defined %}	option gateway '{{value.gateway}}'
 {% endif %}
 {% if value.dns is defined %}	option dns '{{value.dns}}'

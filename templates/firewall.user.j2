@@ -13,8 +13,10 @@ PuertosBackup='{{puertosBackup}}'
 #En caso de querer explicitar las redes clientes, hay que hacer una regla por cada una. Es mas eficiente hacer una sola regla. (y aumenta la velocidad del trafico).
 {% for key,value in interfaces.iteritems() %}
 {% if value.tipo is equalto 'backbone' %}
-iptables -A FORWARD -i "\$IFBackbone{{value.interfaz}}" -p tcp -m multiport --sport "\$PuertosBackup" -j ACCEPT
-iptables -A FORWARD -o "\$IFBackbone{{value.interfaz}}" -p tcp -m multiport --dport "\$PuertosBackup" -j ACCEPT
+iptables -A FORWARD -i "\$IFBackbone{{value.interfaz}}" -p tcp -m multiport --dport "\$PuertosBackup" -j ACCEPT
+iptables -A FORWARD -o "\$IFBackbone{{value.interfaz}}" -p tcp  --dport 5565 -j ACCEPT
+#SSH para instalacion: installation server -> cliente
+iptables -A FORWARD -i "\$IFBackbone{{value.interfaz}}" -p tcp --dport 22 -j ACCEPT
+
 {% endif %}
 {% endfor %}
-

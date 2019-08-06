@@ -6,3 +6,4 @@ puertosBackup: '5555,5565,18000:18009'
 puertoSSH: 22
 puertoWeb: 80
 redAdministracion: '10.1.14.0/23'
+zabbixIp: 10.1.107.55
