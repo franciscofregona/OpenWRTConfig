@@ -2,8 +2,8 @@ config system
 	option ttylogin '0'
 	option log_size '64'
 	option urandom_seed '0'
-	option hostname '{{inventory_hostname}}.bkp.santafe.gov.ar'
-	option zonename 'America/Argentina/Cordoba'
+	option hostname '{{inventory_hostname}}.{{domain}}'
+	option zonename '{{timezone}}'
 	option timezone '<-03>3'
 	option log_proto 'udp'
 	option conloglevel '8'
@@ -11,4 +11,4 @@ config system
 
 config timeserver 'ntp'
 	option enabled '1'
-	list server 'time.santafe.gov.ar'
+	list server '{{timeserver}}'

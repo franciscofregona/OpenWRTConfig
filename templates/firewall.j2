@@ -6,112 +6,112 @@ config defaults
 config include
 	option path '/etc/firewall.user'
 
-# Zona para los clientes #
+# Clients Zone #
 config zone
 	option name 'Clientes'
 	option family 'ipv4'
-	option network '{% for key,value in interfaces.iteritems() %}{% if value.tipo is equalto 'cliente' %}{{ key }} {% endif %}{% endfor %}'
+	option network '{% for key,value in interfaces.iteritems() %}{% if value.type is equalto 'client' %}{{ key }} {% endif %}{% endfor %}'
 	option forward 'DROP'
 	option input 'DROP'
 	option output 'DROP'
 
-# Zona para los backbones #
+# Backbone Zone #
 config zone
 	option name 'backbone'
 	option family 'ipv4'
-	option network '{% for key,value in interfaces.iteritems() %}{% if value.tipo is equalto 'backbone' %}{{ key }} {% endif %}{% endfor %}'
+	option network '{% for key,value in interfaces.iteritems() %}{% if value.type is equalto 'backbone' %}{{ key }} {% endif %}{% endfor %}'
 	option input 'DROP'
 	option output 'DROP'
 	option forward 'DROP'
 
-# Zona para las interfaces de management #
+# Management interface Zone #
 config zone
 	option name 'Management'
 	option family 'ipv4'
-	option network '{% for key,value in interfaces.iteritems() %}{% if value.tipo is equalto 'management' %}{{ key }} {% endif %}{% endfor %}'
+	option network '{% for key,value in interfaces.iteritems() %}{% if value.type is equalto 'management' %}{{ key }} {% endif %}{% endfor %}'
 	option input 'DROP'
 	option forward 'DROP'
 	option output 'DROP'
 
-### Reglas de firewall ###
-# Permitir trafico de ping ICMP sobre zona de Management #
+### Firewall Rules ###
+# Allow ICMP traffic over Management zone #
 config rule
-	option name 'PING out ADM'
+	option name 'PING out MGM'
 	option family 'ipv4'
 	option proto 'icmp'
 	option dest 'Management'
-	option dest_ip '{{redAdministracion}}'
+	option dest_ip '{{MgmNetwork}}'
 	option target 'ACCEPT'
 
 config rule
-	option name 'PING in ADM'
+	option name 'PING in MGM'
 	option family 'ipv4'
 	option proto 'icmp'
 	option src 'Management'
-	option src_ip '{{redAdministracion}}'
+	option src_ip '{{MgmNetwork}}'
 	option target 'ACCEPT'
 
-# Permitir trafico de ping ICMP al servidor Zabbix #
+# Allow Ping for monitoring (ie: Zabbix) #
 config rule
-	option name 'PING out Zabbix'
+	option name 'PING out Monitor'
 	option family 'ipv4'
 	option proto 'icmp'
 	option dest 'Management'
-	option dest_ip '{{zabbixIp}}'
+	option dest_ip '{{MonitorIP}}'
 	option target 'ACCEPT'
 
 config rule
-	option name 'PING in Zabbix'
+	option name 'PING in Monitor'
 	option family 'ipv4'
 	option proto 'icmp'
 	option src 'Management'
-	option src_ip '{{zabbixIp}}'
+	option src_ip '{{MonitorIP}}'
 	option target 'ACCEPT'
 	
-#Estas reglas se repetiran para cada interfaz de management.
+#This rule will repeat for each interface on Management zone.
 {% for key,value in interfaces.iteritems() %}
-{% if value.tipo is equalto 'management' %}
-# Permitir trafico SSH #
+{% if value.type is equalto 'management' %}
+# Allow SSH Traffic #
 config rule
-	option name 'SSH in ADM en {{value.interfaz}}'
+	option name 'SSH over MGM on {{value.interface}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest_ip '{{ value.ip }}'
-	option dest_port '{{puertoSSH}}'
+	option dest_port '{{SSHPort}}'
 	option extra '-m conntrack --ctstate NEW,ESTABLISHED'
 	option src 'Management'
-	option src_ip '{{redAdministracion}}'
+	option src_ip '{{MgmNetwork}}'
 	option target 'ACCEPT'
 
 config rule
-	option name 'SSH out ADM en {{value.interfaz}}'
+	option name 'SSH out MGM on {{value.interface}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest 'Management'
-	option dest_ip '{{redAdministracion}}'
+	option dest_ip '{{MgmNetwork}}'
 	option extra '-m conntrack --ctstate ESTABLISHED'
-	option src_port '{{puertoSSH}}'
+	option src_port '{{SSHPort}}'
 	option target 'ACCEPT'
 
-# Permitir trafico a la web de administracion sobre zona de Management #
+# Allow traffic for the management web over the management zone. #
 config rule
-	option name 'Web Adm in ADM en {{value.interfaz}}'
+	option name 'Web Adm over MGM on {{value.interface}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest_ip '{{ value.ip }}'
-	option dest_port '{{ puertoWeb }}'
+	option dest_port '{{ WebPort }}'
 	option src 'Management'
-	option src_ip '{{redAdministracion}}'
+	option src_ip '{{MgmNetwork}}'
 	option target 'ACCEPT'
 
 config rule
-	option name 'Web Adm out ADM en {{value.interfaz}}'
+	option name 'Web Adm out MGM on {{value.interface}}'
 	option family 'ipv4'
 	option proto 'tcp'
 	option dest 'Management'
-	option dest_ip '{{redAdministracion}}'
+	option dest_ip '{{MgmNetwork}}'
 	option src_ip '{{ value.ip }}'
-	option src_port '{{ puertoWeb }}'
+	option src_port '{{ WebPort }}'
 	option target 'ACCEPT'
 {% endif %}
 {% endfor %}

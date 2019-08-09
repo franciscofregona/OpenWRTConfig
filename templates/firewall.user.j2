@@ -1,22 +1,21 @@
-#Los puertos que han de abrirse a ese pasaje de red de clientes a red de backbone.
-PuertosBackup='{{puertosBackup}}'
+# Custom firewall rules go here.
+# The main drawback from the firewall set up via GUI is that it does not easily support forwarding on specific ports, thus this file.
+#
 
-#La Interfaz 'de salida' en un pasaje/ruteo de paquetes de clientes a red de backbone.
-#(O sea, la interfaz del router a la red de backbone.)
-#Se crea una variable por cada interfaz de backbone presente...
+#Open this ports for routing between clients and backbone.
+OpenPorts='{{OpenPorts}}'
+
+#Creating a variable for each interface on the backbone zone
 {% for key,value in interfaces.iteritems() %}
-{% if value.tipo is equalto 'backbone' %}IFBackbone{{value.interfaz}}='{{value.interfaz}}'
+{% if value.type is equalto 'backbone' %}IFBackbone{{value.interface}}='{{value.interface}}'
 {% endif %}
 {% endfor %}
 
-#Habilitar pasaje/ruteo Clientes->Backbone.
-#En caso de querer explicitar las redes clientes, hay que hacer una regla por cada una. Es mas eficiente hacer una sola regla. (y aumenta la velocidad del trafico).
+# Open up Clients <-> Backbone routing.
+{# Add rules as needed. #}
 {% for key,value in interfaces.iteritems() %}
-{% if value.tipo is equalto 'backbone' %}
-iptables -A FORWARD -i "\$IFBackbone{{value.interfaz}}" -p tcp -m multiport --dport "\$PuertosBackup" -j ACCEPT
-iptables -A FORWARD -o "\$IFBackbone{{value.interfaz}}" -p tcp  --dport 5565 -j ACCEPT
-#SSH para instalacion: installation server -> cliente
-iptables -A FORWARD -i "\$IFBackbone{{value.interfaz}}" -p tcp --dport 22 -j ACCEPT
+{% if value.type is equalto 'backbone' %}
+iptables -A FORWARD -i "\$IFBackbone{{value.interface}}" -p tcp -m multiport --dport "\$OpenPorts" -j ACCEPT
 
 {% endif %}
 {% endfor %}

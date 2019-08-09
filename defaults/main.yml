@@ -1,9 +1,13 @@
 ---
-# defaults file for routersetup
-#Puertos a los que se permitira el ruteo. Especificar rangos con ":". Ej 5555:5565 e individuales con comas.
-#Funcionara mezclar ambos (ie: 5555,5565,1000:1010).
-puertosBackup: '5555,5565,18000:18009'
-puertoSSH: 22
-puertoWeb: 80
-redAdministracion: '10.1.14.0/23'
-zabbixIp: 10.1.107.55
+# Ports to be allowed to cross over from client zone to backbone.
+# Comma separated list, colon delimited ranges.
+OpenPorts: '18001,18003,18010:18019'
+
+SSHPort: 22
+WebPort: 80
+MgmNetwork: '10.1.10.0/24'
+MonitorIP: 10.1.100.98
+ClientMTU: 9000
+timezone: 'America/Argentina/Cordoba'
+domain: 'example.org'
+timeserver: 'time.{{domain}}'

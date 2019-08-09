@@ -1,68 +1,73 @@
 ---
+- name: OpenWRT Config. Base folder for config files created.
+  file:
+    path: "{{inventory_dir}}/host_files"
+    state: directory
+  delegate_to: 127.0.0.1
 
-- name: Routers. Crear carpetas locales.
+- name: OpenWRT Config. Per host config folder created.
   file:
     path: "{{inventory_dir}}/host_files/{{inventory_hostname}}"
     state: directory
   delegate_to: 127.0.0.1
 
-- name: Routers. Crear template archivo System
+- name: OpenWRT Config. Template the system config file.
   template:
     src: system.j2
     dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/system"
   delegate_to: 127.0.0.1
 
-- name: Routers. Crear template archivo network
+- name: OpenWRT Config. Template the network config file.
   template:
     src: network.j2
     dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/network"
   delegate_to: 127.0.0.1
 
-- name: Routers. Crear template archivo firewall.user.
+- name: OpenWRT Config. Template the custom firewall.user file.
   template:
     src: firewall.user.j2
     dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall.user"
   delegate_to: 127.0.0.1
 
-- name: Routers. Crear template archivo firewall.
+- name: OpenWRT Config. Template the firewall config file.
   template:
     src: firewall.j2
     dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall"
   delegate_to: 127.0.0.1
 
-- name: Routers. Crear template archivo dropbear.
+- name: OpenWRT Config. Template ssh Dropbear config file
   template:
     src: dropbear.j2
     dest: "{{inventory_dir}}/host_files/{{inventory_hostname}}/dropbear"
   delegate_to: 127.0.0.1
   
-- name: Routers. Aplicacion de cfg. System.
+- name: OpenWRT Config. Apply over the system config file.
   raw: echo "{{item}}" > /etc/config/system
   with_file:
     - "{{inventory_dir}}/host_files/{{inventory_hostname}}/system"
 
-- name: Routers. Aplicacion de cfg. Interfaces de red.
+- name: OpenWRT Config. Apply over the network config file.
   raw: echo "{{item}}" > /etc/config/network
   with_file:
     - "{{inventory_dir}}/host_files/{{inventory_hostname}}/network"
 
-- name: Routers. Aplicacion de cfg. Firewall.user.
+- name: OpenWRT Config. Apply over the custom firewall.user file.
   raw: echo "{{item}}" > /etc/firewall.user
   with_file:
     - "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall.user"
 
-- name: Routers. Aplicacion de cfg. Firewall (web).
+- name: OpenWRT Config. Apply over the firewall config file.
   raw: echo "{{item}}" > /etc/config/firewall
   with_file:
     - "{{inventory_dir}}/host_files/{{inventory_hostname}}/firewall"
 
-- name: Routers. Aplicacion de cfg. Dropbear (ssh).
+- name: OpenWRT Config. Apply over the Dropbear config file for the ssh service.
   raw: echo "{{item}}" > /etc/config/dropbear
   with_file:
     - "{{inventory_dir}}/host_files/{{inventory_hostname}}/dropbear"
 
-- name: Routers. Reiniciar las redes.
+- name: OpenWRT Config. Reload networks.
   raw: /etc/init.d/network reload
   
-- name: Routers. Reiniciar firewall.
+- name: OpenWRT Config. Reload firewall.
   raw: /etc/init.d/firewall reload
